@@ -19,19 +19,21 @@ with urllib.request.urlopen("https://olinda.bcb.gov.br/olinda/servico/Expectativ
 # transforma json para df
 monthly_data_df = pd.DataFrame.from_dict(
     monthly_data['value'], orient='columns')
-print(monthly_data_df.head)
+monthly_data_df.to_csv('./output/monthly_data_df.csv')
 
 quarterly_data_df = pd.DataFrame.from_dict(
     quarterly_data['value'], orient='columns')
-print(quarterly_data_df.head)
+quarterly_data_df.to_csv('./output/quarterly_data_df.csv')
+
 
 twelve_months_data_df = pd.DataFrame.from_dict(
     twelve_months_data['value'], orient='columns')
-print(twelve_months_data_df.head)
+twelve_months_data_df.to_csv('./output/twelve_months_data_df.csv')
+
 
 annual_data_df = pd.DataFrame.from_dict(
     annual_data['value'], orient='columns')
-print(annual_data_df.head)
+annual_data_df.to_csv('./output/annual_data_df.csv')
 
 
 
