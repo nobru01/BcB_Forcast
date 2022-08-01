@@ -6,6 +6,9 @@ from pandas.io.json import json_normalize
 with urllib.request.urlopen("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativaMercadoMensais?$top=1000&$orderby=Data%20desc&$format=json&$select=Indicador,Data,DataReferencia,Media,Mediana,Minimo,Maximo,numeroRespondentes") as url:
     monthly_data = json.loads(url.read().decode())
 
+with urllib.request.urlopen("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoSelic?$top=100&$orderby=Data%20desc&$format=json&$select=*") as url:
+    selic_data = json.loads(url.read().decode())
+
 with urllib.request.urlopen("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoTrimestrais?$top=100&$orderby=Data%20desc&$format=json&$select=Indicador,Data,DataReferencia,Media,Mediana,Minimo,Maximo,numeroRespondentes") as url:
     quarterly_data = json.loads(url.read().decode())
 
@@ -15,11 +18,14 @@ with urllib.request.urlopen("https://olinda.bcb.gov.br/olinda/servico/Expectativ
 with urllib.request.urlopen("https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$top=1000&$orderby=Data%20desc&$format=json&$select=Indicador,IndicadorDetalhe,Data,DataReferencia,Media,Mediana,Minimo,Maximo,numeroRespondentes") as url:
     annual_data = json.loads(url.read().decode())
 
-
 # transforma json para df
 monthly_data_df = pd.DataFrame.from_dict(
     monthly_data['value'], orient='columns')
 monthly_data_df.to_csv('./output/monthly_data_df.csv')
+
+selic_data_df = pd.DataFrame.from_dict(
+    selic_data['value'], orient='columns')
+selic_data_df.to_csv('./output/selic_data_df.csv')
 
 quarterly_data_df = pd.DataFrame.from_dict(
     quarterly_data['value'], orient='columns')
