@@ -41,5 +41,7 @@ annual_data_df = pd.DataFrame.from_dict(
     annual_data['value'], orient='columns')
 annual_data_df.to_csv('./output/annual_data_df.csv')
 
+print("json_collect executed")
+
 
 
