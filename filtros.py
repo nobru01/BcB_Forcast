@@ -9,9 +9,12 @@ import plotly
 
 pd.options.display.float_format = '{:,.2f}'.format
 
-print('Inicializado Rotina json_collect.py.')
-from json_collect import coletar
-coletar()
+atualiza_dados=input('Atualiza dados importando da API?(y/n)')
+if atualiza_dados.lower()=='y':
+        
+    print('Inicializado Rotina json_collect.py.')
+    from json_collect import coletar
+    coletar()
 
 # os.chdir(sys.path[0])
 # # os.chdir(os.path.join(os.getcwd(),"json_collect.py"))                  # Modifica o diretório de trabalho, para os caminhos relativos funcionar. (https://stackoverflow.com/questions/1432924/python-change-the-scripts-working-directory-to-the-scripts-own-directory)
@@ -368,8 +371,8 @@ calc_pre_periodo(datetime.datetime(2022,10,29).date(),12)
 
 # %%
 # Gera num_indice_taxa_pre-fixa
-taxa_pre_1=12.85
-taxa_pre_2=13.19
+taxa_pre_1=13.14
+taxa_pre_2=13.34
 for i in range(0,len(df_juros_real)):
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_1']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_1)
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_2']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_2)
