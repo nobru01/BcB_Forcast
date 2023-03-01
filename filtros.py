@@ -70,7 +70,7 @@ df_selic.head(20)
 fig=px.line(df_selic,x='data_reuniao',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
 # plotly.offline.plot(fig, show_link = True,filename=f'./output/IPCA_forcast.html')
-fig.show()
+# fig.show()
 
 # %%
 # Informada à partir do 4º dia útil anterior à data de cálculo da expectativa.
@@ -249,7 +249,7 @@ df_ipca_ultima
 fig=px.line(df_ipca_ultima,x=df_ipca_ultima.index,y=['cumsum_mediana'])
 # Gerando arquivo com o resultado
 # plotly.offline.plot(fig, show_link = True,filename=f'./output/tx_desocupacao_forcast.html')
-fig.show()
+# fig.show()
 
 # %%
 # Relação de datas até o mínimo entre os dataframes, para evitar erros
@@ -300,7 +300,7 @@ df_juros_real
 fig=px.line(df_juros_real,x=df_juros_real.index,y=['num_indice_selic','num_indice_ipca','dif_num_indice'])
 # Gerando arquivo com o resultado
 # plotly.offline.plot(fig, show_link = True,filename=f'./output/IPCA_forcast.html')
-fig.show()
+# fig.show()
 
 # %%
 from time import strptime
@@ -397,7 +397,7 @@ df_juros_real
 fig=px.line(df_juros_real,x=df_juros_real.index,y=['juros_real_acum_from_now','juros_real_mesal',f'juros_real_acum_from_now_pre_{taxa_pre_1}%',f'juros_real_acum_from_now_pre_{taxa_pre_2}%'])
 # Gerando arquivo com o resultado
 plotly.offline.plot(fig, show_link = True,filename=f'./output/Juros_real_forcast.html', auto_open=False)
-fig.show()
+# fig.show()
 
 
 # %%
