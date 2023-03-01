@@ -154,25 +154,25 @@ df_monthly['Indicador'].unique()
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='IPCA'],x='DataReferencia',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/IPCA_forcast.html')
+plotly.offline.plot(fig, show_link = True,filename=f'./output/IPCA_forcast.html', auto_open=False)
 # fig.show()
 
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='IGP-M'],x='DataReferencia',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/IGPM_forcast.html')
+plotly.offline.plot(fig, show_link = True,filename=f'./output/IGPM_forcast.html', auto_open=False)
 # fig.show()
 
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='Câmbio'],x='DataReferencia',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/cambio_forcast.html')
+plotly.offline.plot(fig, show_link = True,filename=f'./output/cambio_forcast.html', auto_open=False)
 # fig.show()
 
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='Taxa de desocupação'],x='DataReferencia',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/tx_desocupacao_forcast.html')
+plotly.offline.plot(fig, show_link = True,filename=f'./output/tx_desocupacao_forcast.html', auto_open=False)
 # fig.show()
 
 # %%
@@ -371,8 +371,8 @@ calc_pre_periodo(datetime.datetime(2022,10,29).date(),12)
 
 # %%
 # Gera num_indice_taxa_pre-fixa
-taxa_pre_1=13.14
-taxa_pre_2=13.34
+taxa_pre_1=12.84
+taxa_pre_2=13.49
 for i in range(0,len(df_juros_real)):
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_1']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_1)
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_2']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_2)
@@ -396,7 +396,7 @@ df_juros_real
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_juros_real,x=df_juros_real.index,y=['juros_real_acum_from_now','juros_real_mesal',f'juros_real_acum_from_now_pre_{taxa_pre_1}%',f'juros_real_acum_from_now_pre_{taxa_pre_2}%'])
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/Juros_real_forcast.html', auto_open=False)
+plotly.offline.plot(fig, show_link = True,filename=f'./output/Juros_real_forcast.html', auto_open=True)
 # fig.show()
 
 
