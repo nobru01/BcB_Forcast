@@ -69,7 +69,7 @@ df_selic.head(20)
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_selic,x='data_reuniao',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-# plotly.offline.plot(fig, show_link = True,filename=f'./output/IPCA_forcast.html')
+plotly.offline.plot(fig, show_link = True,filename=f'./output/SELIC_forcast.html')
 # fig.show()
 
 # %%
