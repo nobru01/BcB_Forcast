@@ -1,0 +1,3 @@
+# sites: https://dadosabertos.bcb.gov.br/dataset/expectativas-mercado
+# Sintase: https://dadosabertos.bcb.gov.br/dataset/expectativas-mercado/resource/d420a704-75a7-4f45-8f4b-0fca813c70f0
+# documentação: https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/documentacao

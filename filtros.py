@@ -1,6 +1,5 @@
 
 import pandas as pd
-import os
 import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -15,18 +14,8 @@ if atualiza_dados.lower()=='y':
     print('Inicializado Rotina json_collect.py.')
     from json_collect import coletar
     coletar()
+                  
 
-# os.chdir(sys.path[0])
-# # os.chdir(os.path.join(os.getcwd(),"json_collect.py"))                  # Modifica o diretório de trabalho, para os caminhos relativos funcionar. (https://stackoverflow.com/questions/1432924/python-change-the-scripts-working-directory-to-the-scripts-own-directory)
-# # print(os.getcwd())
-# %run ./json_collect.py                      
-
-# %%
-# sites: https://dadosabertos.bcb.gov.br/dataset/expectativas-mercado
-# Sintase: https://dadosabertos.bcb.gov.br/dataset/expectativas-mercado/resource/d420a704-75a7-4f45-8f4b-0fca813c70f0
-# documentação: https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/documentacao
-
-# %%
 # Relações datas das reunições inseridas manualmente quando não tem previsão
 df_selic_data=pd.read_csv('./input/selic_datas.csv',index_col='Reuniao')
 # Dados baixados pelo .json
@@ -104,9 +93,6 @@ for i in range(1,len(df_selic_ultima)):
     df_selic_ultima.loc[df_selic_ultima.index[i],'num_indice']=df_selic_ultima.loc[df_selic_ultima.index[i-1],'num_indice']*(1+df_selic_ultima.loc[df_selic_ultima.index[i-1],'Mediana']/100)**(df_selic_ultima.loc[df_selic_ultima.index[i],'periodo']/365)
 df_selic_ultima.to_csv('./output/selic_ultima_expectativa.csv',float_format='%.2f')
 
-
-# %%
-df_selic_ultima
 
 # %%
 #### Função que calcula a SELIC do período entre data atual e data final
@@ -398,9 +384,4 @@ fig=px.line(df_juros_real,x=df_juros_real.index,y=['juros_real_acum_from_now','j
 # Gerando arquivo com o resultado
 plotly.offline.plot(fig, show_link = True,filename=f'./output/Juros_real_forcast.html', auto_open=True)
 # fig.show()
-
-
-# %%
-
-
 
