@@ -1,6 +1,5 @@
 import urllib.request, json 
 import pandas as pd
-from pandas.io.json import json_normalize
 
 def coletar():
     # coleta dados api
