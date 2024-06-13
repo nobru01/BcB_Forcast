@@ -357,8 +357,8 @@ calc_pre_periodo(datetime.datetime(2022,10,29).date(),12)
 
 # %%
 # Gera num_indice_taxa_pre-fixa
-taxa_pre_1=12.84
-taxa_pre_2=13.49
+taxa_pre_1=11.56
+taxa_pre_2=12.25
 for i in range(0,len(df_juros_real)):
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_1']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_1)
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_2']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_2)
