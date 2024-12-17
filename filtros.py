@@ -1,37 +1,32 @@
-
 import pandas as pd
 import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import plotly.express as px
 import plotly
+import numpy as np
 
 pd.options.display.float_format = '{:,.2f}'.format
 
 atualiza_dados=input('Atualiza dados importando da API?(y/n)')
 if atualiza_dados.lower()=='y':
-        
     print('Inicializado Rotina json_collect.py.')
     from json_collect import coletar
     coletar()
-                  
 
 # Relações datas das reunições inseridas manualmente quando não tem previsão
-df_selic_data=pd.read_csv('./input/selic_datas.csv',index_col='Reuniao')
+df_selic_data=pd.read_csv('./input/selic_datas.csv', index_col='Reuniao')
 # Dados baixados pelo .json
-df_selic=pd.read_csv('./output/selic_data_df.csv',index_col='Reuniao')
+df_selic=pd.read_csv('./output/selic_data_df.csv', index_col='Reuniao')
 df_selic=df_selic.drop(columns=['Unnamed: 0','Indicador'])
-df_selic['Data']=df_selic.apply(lambda x: datetime.datetime.strptime(x.Data,'%Y-%m-%d').date(),axis=1)
+df_selic['Data']=pd.to_datetime(df_selic['Data']).dt.date
 
-# Relaciona a reunião com sua Data.
 df_selic['data_reuniao']=''
-for i in range(0, len(df_selic)):
-    busca_data=''
+for i in range(len(df_selic)):
     try:
         busca_data=df_selic_data.loc[df_selic.index[i],'data_reuniao']
         busca_data=datetime.datetime.strptime(busca_data,'%Y-%m-%d').date()
         df_selic.loc[df_selic.index[i],'data_reuniao']=busca_data
-
     except:
         #### será definida um expectativa para a data.
         # busca_data=df_selic_data.loc[df_selic.index[i],'data_reuniao']
@@ -42,6 +37,7 @@ for i in range(0, len(df_selic)):
 # df_selic=df_selic[df_selic['data_reuniao']!='']
 df_selic=df_selic.sort_values(by=['Data','data_reuniao','baseCalculo'],ascending=[False,True,False])
 
+
 '''Base de cálculo para as estatísticas
  baseada no prazo de validade das expectativas
  informadas pelas instituições informantes:
@@ -51,21 +47,15 @@ df_selic=df_selic.sort_values(by=['Data','data_reuniao','baseCalculo'],ascending
   - 1: uso das expectativas mais recentes informadas
    pelas instituições participantes a partir do
     4º dia útil anterior à data de cálculo das estatísticas'''
-
-df_selic.head(20)
-
-# %%
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_selic,x='data_reuniao',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/SELIC_forcast.html')
-# fig.show()
+plotly.offline.plot(fig, show_link = True, filename=f'./output/SELIC_forcast.html')
 
-# %%
 # Informada à partir do 4º dia útil anterior à data de cálculo da expectativa.
-df_selic=df_selic[df_selic['baseCalculo']==1]           
+df_selic = df_selic[df_selic['baseCalculo']==1]
 # Expectativa mais atual
-df_selic_ultima=df_selic[df_selic['Data']==df_selic['Data'].max()]
+df_selic_ultima = df_selic[df_selic['Data']==df_selic['Data'].max()].copy()
 # df_selic_ultima['mediana_mensal']=df_selic_ultima.apply(lambda x: (1+(x.Mediana/100))**(1/12)-1,axis=1)
 
 # %%
@@ -79,7 +69,6 @@ while type(selic_atual)!=float:
     except:
         continue
 
-# %%
 # Cria num_indice inicial atribuindo 100 para a data de hoje
 ## Pode acontecer de demora para atualização do json do bc, gerando o primeiro período negativo, mas não tem problema
 df_selic_ultima.loc[df_selic_ultima.index[0],'num_indice']=100*(1+selic_atual/100)**(df_selic_ultima.loc[df_selic_ultima.index[0],'periodo']/365)
@@ -91,10 +80,9 @@ for i in range(1,len(df_selic_ultima)):
 
     df_selic_ultima.loc[df_selic_ultima.index[i],'periodo']=(df_selic_ultima.loc[df_selic_ultima.index[i],'data_reuniao']-df_selic_ultima.loc[df_selic_ultima.index[i-1],'data_reuniao']).days
     df_selic_ultima.loc[df_selic_ultima.index[i],'num_indice']=df_selic_ultima.loc[df_selic_ultima.index[i-1],'num_indice']*(1+df_selic_ultima.loc[df_selic_ultima.index[i-1],'Mediana']/100)**(df_selic_ultima.loc[df_selic_ultima.index[i],'periodo']/365)
+
 df_selic_ultima.to_csv('./output/selic_ultima_expectativa.csv',float_format='%.2f')
 
-
-# %%
 #### Função que calcula a SELIC do período entre data atual e data final
 def calc_selic_periodo(df,data_f):
     # DF é um dataframe que contenha a culuna com num_indice
@@ -106,48 +94,29 @@ def calc_selic_periodo(df,data_f):
     
     # Utiliza o número índice anterior + variação dos dias dentro do período
     else:
-        # Último número índice
-        df=df[df['data_reuniao']<=data_f]
-        n_indice=df.loc[df.index[-1],'num_indice']
-        taxa=df.loc[df.index[-1],'Mediana']
-        n_dias=(data_f-df.loc[df.index[-1],'data_reuniao']).days
+        df2=df[df['data_reuniao']<=data_f]
+        n_indice=df2.loc[df2.index[-1],'num_indice']
+        taxa=df2.loc[df2.index[-1],'Mediana']
+        n_dias=(data_f-df2.loc[df2.index[-1],'data_reuniao']).days
         return n_indice*(1+taxa/100)**(n_dias/365)
 
-
-# %%
-calc_selic_periodo(df_selic_ultima,datetime.datetime(2022,10,25).date())
-
-# %%
 df_monthly=pd.read_csv('./output/monthly_data_df.csv')
 df_monthly=df_monthly.drop(columns=['Unnamed: 0'])
-
-# Parses
-df_monthly['Data']=df_monthly.apply(lambda x: datetime.datetime.strptime(x.Data,'%Y-%m-%d').date(),axis=1)
-
-df_monthly['DataReferencia']=df_monthly.apply(lambda x: datetime.datetime.strptime(x.DataReferencia,'%m/%Y').date(),axis=1)
+df_monthly['Data']=pd.to_datetime(df_monthly['Data']).dt.date
+df_monthly['DataReferencia']=pd.to_datetime(df_monthly['DataReferencia'], format='%m/%Y').dt.date
 delta = relativedelta(months=1)
 delta_d = timedelta(days=1)
-df_monthly['DataReferencia']=df_monthly.apply(lambda x: x.DataReferencia+delta-delta_d,axis=1)
+df_monthly['DataReferencia']=df_monthly['DataReferencia'].apply(lambda x: x+delta-delta_d)
 
 df_monthly=df_monthly.sort_values(by=['Data','DataReferencia','numeroRespondentes'],ascending=[False,True,False])
-# df_monthly=df_selic[df_selic['baseCalculo']==1]           # não sei qual é a diferença da base de cálculo.
-df_monthly.head(20)
 
-# %%
-df_monthly['Indicador'].unique()
-
-# %%
-# Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='IPCA'],x='DataReferencia',y='Mediana', color='Data')
-# Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/IPCA_forcast.html', auto_open=False)
-# fig.show()
+plotly.offline.plot(fig, show_link=True, filename=f'./output/IPCA_forcast.html', auto_open=False)
 
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='IGP-M'],x='DataReferencia',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
 plotly.offline.plot(fig, show_link = True,filename=f'./output/IGPM_forcast.html', auto_open=False)
-# fig.show()
 
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_monthly[df_monthly['Indicador']=='Câmbio'],x='DataReferencia',y='Mediana', color='Data')
@@ -161,13 +130,15 @@ fig=px.line(df_monthly[df_monthly['Indicador']=='Taxa de desocupação'],x='Data
 plotly.offline.plot(fig, show_link = True,filename=f'./output/tx_desocupacao_forcast.html', auto_open=False)
 # fig.show()
 
-# %%
 # Expectativa mais atual para IPCA
-df_ipca=df_monthly[df_monthly['Indicador']=='IPCA']
-
+df_ipca=df_monthly[df_monthly['Indicador']=='IPCA'].copy()
 data_previsao=df_ipca['Data'].max()
-df_ipca_ultima=df_ipca[df_ipca['Data']==data_previsao]
-df_ipca_ultima=df_ipca_ultima.groupby(['DataReferencia']).mean() # adotado média 
+df_ipca_ultima=df_ipca[df_ipca['Data']==data_previsao].copy()
+
+# Selecione apenas colunas numéricas antes de calcular a média
+df_ipca_ultima_numeric = df_ipca_ultima.select_dtypes(include=[np.number]).copy()
+df_ipca_ultima_numeric['DataReferencia'] = df_ipca_ultima['DataReferencia']
+df_ipca_ultima = df_ipca_ultima_numeric.groupby('DataReferencia', as_index=True).mean(numeric_only=True)
 
 df_ipca_ultima['cumsum_mediana'] = df_ipca_ultima['Mediana'].cumsum()
 #cumsum()-> soma acumulada de uma lista ou array termo a termo
@@ -176,35 +147,24 @@ df_ipca_ultima['cumsum_mediana'] = df_ipca_ultima['Mediana'].cumsum()
 
 # %%
 # Insere coluna com números de dias no período (entre duas datas)
+
 df_ipca_ultima.loc[df_ipca_ultima.index[0],'periodo']=(df_ipca_ultima.index[0]-datetime.datetime.today().date()).days
 
 # Define número índice de ref. 100 na data de hoje.
 df_ipca_ultima.loc[df_ipca_ultima.index[0],'num_indice']=100*(1+df_ipca_ultima.loc[df_ipca_ultima.index[0],'Mediana']/100)**(df_ipca_ultima.loc[df_ipca_ultima.index[0],'periodo']/30)
+
 for i in range(1,len(df_ipca_ultima)):
     df_ipca_ultima.loc[df_ipca_ultima.index[i],'periodo']=(df_ipca_ultima.index[i]-df_ipca_ultima.index[i-1]).days
     df_ipca_ultima.loc[df_ipca_ultima.index[i],'num_indice']=df_ipca_ultima.loc[df_ipca_ultima.index[i-1],'num_indice']*(1+df_ipca_ultima.loc[df_ipca_ultima.index[i],'Mediana']/100)**(df_ipca_ultima.loc[df_ipca_ultima.index[i],'periodo']/30)
+
 df_ipca_ultima.to_csv('./output/ipca_ultima_expectativa.csv',float_format='%.4f')
-df_ipca_ultima
 
-# %%
-# from matplotlib.pyplot import figure
-# figure(figsize=(10, 5), dpi=120)
-# plt.plot(df_ipca_ultima.index, df_ipca_ultima['Mediana'], label=f'ipca_expectaiva_{data_previsao}')
-# plt.xticks(rotation=90)
-# plt.legend()
-# plt.show()
-
-
-# %%
-#### Função que calcula a IPCA do período entre data hoje e data final
 def calc_ipca_periodo(df,data_f):
     # DF é um dataframe que contenha a coluna com num_indice
     
     # Utiliza a taxa digitada real vigente
     if data_f<=df.index[0]:
-        # print('primeiro mês')
         n_dias=(data_f-datetime.datetime.today().date()).days
-        # print(n_dias)
         return 100*(1+df.loc[df.index[0],'Mediana']/100)**(n_dias/30)
     
     # Não calcula num_indice para o último termo, pois já está tabelado. 
@@ -217,34 +177,18 @@ def calc_ipca_periodo(df,data_f):
         df_anterior=df[df.index<=data_f]
         # print(df_anterior)
         n_indice=df_anterior.loc[df_anterior.index[-1],'num_indice']
-        #busca o 1º termo depois do corte da df_anterior
-        taxa=df.loc[df.index[len(df_anterior)],'Mediana']    
-        # print(f'taxa:{taxa}')
+        prox_mes = df.index[len(df_anterior)]
+        taxa=df.loc[prox_mes,'Mediana']    
         n_dias=(data_f-df_anterior.index[-1]).days
-        # print(f'n_dias:{n_dias}')
         return n_indice*(1+taxa/100)**(n_dias/30)
 
-# %%
-calc_ipca_periodo(df_ipca_ultima,datetime.datetime(2022,11,30).date())
-
-# %%
-df_ipca_ultima
-
-# %%
-# Gráfico iterativo utilizando o plotly
-fig=px.line(df_ipca_ultima,x=df_ipca_ultima.index,y=['cumsum_mediana'])
-# Gerando arquivo com o resultado
-# plotly.offline.plot(fig, show_link = True,filename=f'./output/tx_desocupacao_forcast.html')
-# fig.show()
-
-# %%
 # Relação de datas até o mínimo entre os dataframes, para evitar erros
 lista_datas_todos_dias=pd.date_range(start=datetime.datetime.today().date(),end=min(df_selic_ultima['data_reuniao'].max(),df_ipca_ultima.index.max()))
 df_juros_real=pd.DataFrame(index=lista_datas_todos_dias,columns=['num_indice_selic','num_indice_ipca'],dtype='float64')
-for i in range(0,len(df_juros_real)):
+
+for i in range(len(df_juros_real)):
     df_juros_real.loc[df_juros_real.index[i],'num_indice_selic']=calc_selic_periodo(df_selic_ultima,df_juros_real.index[i].date())
     df_juros_real.loc[df_juros_real.index[i],'num_indice_ipca']=calc_ipca_periodo(df_ipca_ultima,df_juros_real.index[i].date())
-df_juros_real
 
 # %%
 df_ipca_ultima
@@ -357,8 +301,8 @@ calc_pre_periodo(datetime.datetime(2022,10,29).date(),12)
 
 # %%
 # Gera num_indice_taxa_pre-fixa
-taxa_pre_1=11.56
-taxa_pre_2=12.25
+taxa_pre_1=14.74
+taxa_pre_2=15.33
 for i in range(0,len(df_juros_real)):
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_1']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_1)
     df_juros_real.loc[df_juros_real.index[i],f'num_indice_pre_2']=calc_pre_periodo(df_juros_real.index[i].date(),taxa_pre_2)
