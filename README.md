@@ -1,3 +1,70 @@
+# Sistema de Processamento de Gráficos de previsões do BCB
+
+Este é um sistema para processamento e visualização de gráficos usando Python.
+
+## Pré-requisitos
+
+- Python 3.x instalado
+- Ambiente virtual (venv)
+
+## Instalação e Execução
+
+1. Clone este repositório:
+```bash
+git clone <url-do-repositorio>
+cd <nome-da-pasta>
+```
+
+2. Crie e ative o ambiente virtual:
+
+No Linux/Mac:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+No Windows:
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+```
+
+3. Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+
+4. Execute o script de processamento de imagens:
+```bash
+python3 filtros.py
+```
+
+5. Inicie o servidor web local:
+```bash
+python -m http.server 8000
+```
+
+6. Acesse o sistema no navegador:
+- Abra seu navegador favorito
+- Acesse `http://localhost:8000`
+
+## Observações
+
+- Mantenha o servidor rodando enquanto estiver usando o sistema
+- Para encerrar o servidor, pressione `Ctrl+C` no terminal
+- Para desativar o ambiente virtual quando terminar, digite `deactivate`
+
+## Problemas Comuns
+
+Se você encontrar o erro "Porta 8000 já está em uso", tente usar uma porta diferente:
+```bash
+python -m http.server 8001
+```
+
+## Suporte
+
+Em caso de dúvidas ou problemas, abra uma issue no repositório.
+
 # Projeto BcB_Forcast
 ## Objetivo:
 Desenvolver Dashboard com analise de informações sobre expectativas do mercado e economia com dados vindos da API do Banco Central do Brasil.
@@ -39,7 +106,7 @@ https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/Expectativ
 ## Ferramentas:
 ![](keys_resume.png)
  
-Dentro da key “value” temos a lista de observações que correspondem as expectativas do mercado para um indicador em um dia, com referencia em uma data futura.
+Dentro da key "value" temos a lista de observações que correspondem as expectativas do mercado para um indicador em um dia, com referencia em uma data futura.
 
 A ideia é usar o Dash do Python para criar gráficos interativos com as informações.
 
