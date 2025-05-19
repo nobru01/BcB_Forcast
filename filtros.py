@@ -14,7 +14,7 @@ if atualiza_dados.lower()=='y':
     from json_collect import coletar
     coletar()
 
-# Relações datas das reunições inseridas manualmente quando não tem previsão
+# Relações datas das reuniões inseridas manualmente quando não tem previsão
 df_selic_data=pd.read_csv('./input/selic_datas.csv', index_col='Reuniao')
 # Dados baixados pelo .json
 df_selic=pd.read_csv('./output/selic_data_df.csv', index_col='Reuniao')
@@ -50,7 +50,7 @@ df_selic=df_selic.sort_values(by=['Data','data_reuniao','baseCalculo'],ascending
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_selic,x='data_reuniao',y='Mediana', color='Data')
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True, filename=f'./output/SELIC_forcast.html')
+plotly.offline.plot(fig, show_link = True, filename=f'./output/SELIC_forcast.html', auto_open=False)
 
 # Informada à partir do 4º dia útil anterior à data de cálculo da expectativa.
 df_selic = df_selic[df_selic['baseCalculo']==1]
@@ -214,7 +214,6 @@ def area(tipo,date):
 #     # print(area('selic',df_juros_real.index[i]))
 #     df_juros_real.loc[df_juros_real.index[i], 'area_selic']=area('selic',df_juros_real.index[i])
 #     df_juros_real.loc[df_juros_real.index[i], 'area_ipca']=area('ipca',df_juros_real.index[i])
-
 # df_juros_real
 
 # %%
@@ -326,6 +325,6 @@ df_juros_real
 # Gráfico iterativo utilizando o plotly
 fig=px.line(df_juros_real,x=df_juros_real.index,y=['juros_real_acum_from_now','juros_real_mesal',f'juros_real_acum_from_now_pre_{taxa_pre_1}%',f'juros_real_acum_from_now_pre_{taxa_pre_2}%'])
 # Gerando arquivo com o resultado
-plotly.offline.plot(fig, show_link = True,filename=f'./output/Juros_real_forcast.html', auto_open=True)
+plotly.offline.plot(fig, show_link = True,filename=f'./output/Juros_real_forcast.html', auto_open=False)
 # fig.show()
 
